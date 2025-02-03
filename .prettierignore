@@ -1,0 +1,14 @@
+# Yarn
+.yarn
+.pnp.*
+yarn.lock
+
+# Build
+dist
+coverage
+
+# Misc
+.DS_Store
+node_modules/
+.env
+*.log 
