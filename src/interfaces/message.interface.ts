@@ -1,16 +1,7 @@
-export interface Message {
-	id: string;
-	senderId: string;
-	receiverId: string;
-	content: string;
-	type: "TEXT" | "IMAGE" | "VIDEO";
-	metadata?: Record<string, any>;
-	createdAt: Date;
-}
-
-export interface SendMessageDto {
-	receiverId: string;
-	content: string;
-	type: "TEXT" | "IMAGE" | "VIDEO";
-	metadata?: Record<string, any>;
+export interface Email {
+	to: string;
+	subject: string;
+	priority: "HIGH" | "LOW" | "NORMAL";
+	templateId: string;
+	data: {};
 }

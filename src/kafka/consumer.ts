@@ -1,10 +1,13 @@
 import { Kafka, Consumer } from "kafkajs";
 import { config } from "../config/index.js";
 import logger from "../logger/winston.logger.js";
+import { INTERVAL_MS } from "../constants.js";
+import { BATCH_SIZE } from "../constants.js";
 
 class KafkaConsumer {
 	private consumer: Consumer;
 	private static instance: KafkaConsumer;
+	private isProcessing = false;
 
 	private constructor() {
 		const kafka = new Kafka({
@@ -42,24 +45,59 @@ class KafkaConsumer {
 		}
 	}
 
-	async startConsumer(
-		messageHandler: (message: any) => Promise<void>
+	async consumeEmails(
+		topic: string,
+		messageHandler: (messages: any[]) => Promise<void>
 	): Promise<void> {
 		try {
+			const messageBuffer: any[] = []; // Buffer to store incoming messages
+
 			await this.consumer.run({
-				eachMessage: async ({ topic, partition, message }) => {
+				eachMessage: async ({ message }) => {
 					try {
 						const parsedMessage = JSON.parse(message.value?.toString() || "");
-						await messageHandler(parsedMessage);
+						messageBuffer.push(parsedMessage);
 					} catch (error) {
 						logger.error("Error processing message:", error);
 					}
 				},
 			});
+
+			// Execute batch every INTERVAL_MS seconds if messages exist
+			setInterval(async () => {
+				if (messageBuffer.length > 0 && !this.isProcessing) {
+					this.isProcessing = true;
+					await this.processBatch(messageBuffer, topic, messageHandler);
+					this.isProcessing = false;
+				}
+			}, INTERVAL_MS);
 		} catch (error) {
-			logger.error("Failed to start consumer:", error);
+			logger.error("Failed to start email consumer:", error);
 			throw error;
 		}
+	}
+
+	private async processBatch(
+		messageBuffer: any[],
+		topic: string,
+		messageHandler: (messages: any[]) => Promise<void>
+	): Promise<void> {
+		this.consumer.pause([{ topic }]); // Pause consumer while processing
+
+		const batchToProcess = messageBuffer.splice(0, BATCH_SIZE); // Take up to BATCH_SIZE  messages
+
+		await messageHandler(batchToProcess); // Process batch
+
+		this.consumer.resume([{ topic }]); // Resume consumer after processing
+	}
+
+	async consumerHealth() {
+		this.consumer.on("consumer.heartbeat", (e) => {
+			logger.info("Consumer heartbeat event", e);
+		});
+		this.consumer.on("consumer.crash", (error) => {
+			logger.warn("Kafka crash:", error);
+		});
 	}
 
 	async disconnect(): Promise<void> {

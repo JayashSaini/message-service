@@ -1,12 +1,11 @@
-import { Kafka, Producer } from "kafkajs";
+import { Kafka } from "kafkajs";
 import { config } from "../config/index.js";
-import logger from "../logger/winston.logger.js";
 
 class KafkaProducer {
-	private producer: Producer;
-	private static instance: KafkaProducer;
+	producer;
+	static instance;
 
-	private constructor() {
+	constructor() {
 		const kafka = new Kafka({
 			clientId: config.kafka.clientId,
 			brokers: config.kafka.brokers,
@@ -14,36 +13,36 @@ class KafkaProducer {
 		this.producer = kafka.producer();
 	}
 
-	public static getInstance(): KafkaProducer {
+	static getInstance() {
 		if (!KafkaProducer.instance) {
 			KafkaProducer.instance = new KafkaProducer();
 		}
 		return KafkaProducer.instance;
 	}
 
-	async connect(): Promise<void> {
+	async connect() {
 		try {
 			await this.producer.connect();
-			logger.info("Successfully connected to Kafka producer");
+			console.log("Successfully connected to Kafka producer");
 		} catch (error) {
-			logger.error("Failed to connect to Kafka producer:", error);
+			console.error("Failed to connect to Kafka producer:", error);
 			throw error;
 		}
 	}
 
-	async sendMessage(topic: string, message: any): Promise<void> {
+	async sendMessage(topic, message) {
 		try {
 			await this.producer.send({
 				topic,
 				messages: [{ value: JSON.stringify(message) }],
 			});
 		} catch (error) {
-			logger.error("Failed to send message to Kafka:", error);
+			console.error("Failed to send message to Kafka:", error);
 			throw error;
 		}
 	}
 
-	async disconnect(): Promise<void> {
+	async disconnect() {
 		await this.producer.disconnect();
 	}
 }
