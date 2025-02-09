@@ -1,23 +1,15 @@
 import logger from "./logger/winston.logger.js";
 import { kafkaConsumer } from "./kafka/consumer.js";
+import { emailHandler } from "./services/email.services.js";
+import { EMAIL_TOPIC } from "./constants.js";
 
 async function startServer() {
 	try {
 		// Connect to Kafka
 		await kafkaConsumer.connect();
-		await kafkaConsumer.subscribe(["EMAIL", "SMS", "NOTIFICATION"]);
+		await kafkaConsumer.subscribe([EMAIL_TOPIC]);
 
-		await kafkaConsumer.consumeEmails(
-			"EMAIL",
-			(messages: any[]): Promise<void> => {
-				logger.info(
-					`Processed batch of ${messages.length} messages in ${new Date()}`
-				);
-
-				// Ensure function returns a Promise<void>
-				return Promise.resolve();
-			}
-		);
+		await kafkaConsumer.consumeEmails(EMAIL_TOPIC, emailHandler);
 	} catch (error: any) {
 		logger.error("Failed to start server:", error);
 		process.exit(0);

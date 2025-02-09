@@ -5,10 +5,17 @@ async function startServer() {
 		await kafkaProducer.connect();
 
 		// Example usage: send a message to a topic
-		for (let i = 0; i < 500; i++) {
-			kafkaProducer.sendMessage("EMAIL", { message: "Hello, Kafka!" });
-		}
-		console.log("Sent a message");
+		kafkaProducer.sendMessage("EMAIL", {
+			to: "test@example.com",
+			subject: "Welcome to register xyz company!",
+			templateId: "welcomeTemplate",
+			data: {
+				name: "Jayash Saini",
+				websiteLink: "https://example.com",
+			},
+		});
+
+		console.log("sent email : ", new Date());
 	} catch (error) {
 		console.error("Error in server execution:", error);
 	}

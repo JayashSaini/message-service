@@ -3,7 +3,9 @@ npm-debug.log
 dist
 .git
 .gitignore
-.env
+.env.production
+.env.development
+.env.example
 *.log
 coverage
 .DS_Store
