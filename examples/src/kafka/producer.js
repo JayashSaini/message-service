@@ -1,4 +1,4 @@
-import { Kafka } from "kafkajs";
+import { Kafka, Partitioners } from "kafkajs";
 import { config } from "../config/index.js";
 
 class KafkaProducer {
@@ -10,7 +10,9 @@ class KafkaProducer {
 			clientId: config.kafka.clientId,
 			brokers: config.kafka.brokers,
 		});
-		this.producer = kafka.producer();
+		this.producer = kafka.producer({
+			createPartitioner: Partitioners.DefaultPartitioner,
+		});
 	}
 
 	static getInstance() {

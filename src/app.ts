@@ -11,7 +11,7 @@ async function startServer() {
 			"EMAIL",
 			(messages: any[]): Promise<void> => {
 				logger.info(
-					`Processing ${messages.length} messages for email - ${new Date()}`
+					`Processed batch of ${messages.length} messages in ${new Date()}`
 				);
 
 				// Ensure function returns a Promise<void>
@@ -29,6 +29,11 @@ startServer();
 // Graceful shutdown
 process.on("SIGTERM", async () => {
 	logger.info("SIGTERM received. Shutting down gracefully...");
+	await kafkaConsumer.disconnect();
+	process.exit(0);
+});
+
+process.on("SIGINT", async () => {
 	await kafkaConsumer.disconnect();
 	process.exit(0);
 });
