@@ -1,9 +1,14 @@
+import emailVerification from "./emailVerification.templates.js";
 import welcome from "./welcome.templates.js";
 
 const templates = [
 	{
 		id: "welcomeTemplate",
 		function: welcome,
+	},
+	{
+		id: "emailVerificationTemplate",
+		function: emailVerification,
 	},
 	// Add more templates here...
 ];
