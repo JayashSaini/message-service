@@ -1,14 +1,29 @@
-import emailVerification from "./emailVerification.templates.js";
-import welcome from "./welcome.templates.js";
+import emailVerificationTemplate from "./emailVerification.templates.js";
+import welcomeTemplate from "./welcome.templates.js";
+import twoFATemplate from "./twoFA.templates.js";
+import forgotPasswordTemplate from "./forgotPassword.templates.js";
+import changePasswordTemplate from "./changePassword.templates.js";
 
 const templates = [
 	{
 		id: "welcomeTemplate",
-		function: welcome,
+		function: welcomeTemplate,
 	},
 	{
 		id: "emailVerificationTemplate",
-		function: emailVerification,
+		function: emailVerificationTemplate,
+	},
+	{
+		id: "twoFATemplate",
+		function: twoFATemplate,
+	},
+	{
+		id: "forgotPasswordTemplate",
+		function: forgotPasswordTemplate,
+	},
+	{
+		id: "changePasswordTemplate",
+		function: changePasswordTemplate,
 	},
 	// Add more templates here...
 ];
