@@ -116,7 +116,7 @@ const getEmailVerificationTemplate = (data: any) => {
             <td class="content">
                 <p>Dear <strong>${data.username}</strong>,</p>
                 <p>Thank you for signing up with XYZ Company! To complete your registration, please verify your email address by clicking the button below:</p>
-                <a href="http://localhost:3000/verify/${
+                <a href="http://localhost:3000/email-verification/${
 									data.emailVerificationToken
 								}" class="btn">Verify Email</a>
                 <p>If you didn’t sign up for an account, you can safely ignore this email.</p>
